@@ -1,10 +1,17 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
+import { UsersController } from './controller/users.controller';
+import { UsersService } from './services/users.service';
 import { EmailModule } from 'src/email/email.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, userSchema } from './users.schema';
 
 @Module({
-  imports: [EmailModule],
+  imports: [
+    EmailModule,
+    MongooseModule.forFeature([
+      { name: User.name, schema: userSchema }, // 어떤 colloect을 사용할지 지정
+    ]),
+  ],
   controllers: [UsersController],
   providers: [UsersService],
 })
