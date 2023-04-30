@@ -1,4 +1,4 @@
-import { UserLoginDto } from './../dto/user-login.dto';
+import { UserLoginDto } from 'src/auth/dto/user-login.dto';
 import { UsersRepository } from './../users.repository';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { EmailService } from 'src/email/email.service';

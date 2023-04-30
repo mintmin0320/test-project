@@ -1,6 +1,5 @@
 import { UsersRepository } from 'src/users/users.repository';
-import { UserLoginDto } from './../../users/dto/user-login.dto';
-import { UsersService } from './../../users/services/users.service';
+import { UserLoginDto } from '../dto/user-login.dto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -13,7 +12,7 @@ export class AuthService {
     private jwtService: JwtService, //auth 모듈에 JwtModule에서 사용
   ) { }
 
-  async signIn(userLoginDto: UserLoginDto) {
+  async jwtSignIn(userLoginDto: UserLoginDto) {
     const { email, password } = userLoginDto;
 
     const user = await this.usersRepository.findUserByEmail(email);
@@ -30,7 +29,7 @@ export class AuthService {
       throw new UnauthorizedException('잘못된 비밀번호입니다.');
     }
 
-    const payload = { email: email, sub: user.id }
+    const payload = { email: email, sub: user.id } //sub는 토큰 제목
 
     return { result: true, message: '로그인 성공', token: this.jwtService.sign(payload) } //sign 함수로 토큰에 넣는다
   }
