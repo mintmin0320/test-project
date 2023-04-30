@@ -13,20 +13,13 @@ export class UsersController {
   constructor(private usersService: UsersService) { }
 
   @ApiOperation({ summary: '회원가입', description: 'user 생성 API' })
-  // @ApiCreatedResponse({ description: '유저를 생성한다.', type: User })
-  // @ApiResponse({
-  //   status: 500,
-  //   description: 'Server Error...',
-  // })
-  // @ApiResponse({ status: 500, description: 'Server Error' })
   @ApiResponse({ status: 201, description: '회원가입 성공' })
-  @ApiResponse({ status: 500, description: 'Server Eroor...' })
-  @ApiResponse({ status: 404, description: 'Client Eroor...' })
+  @ApiResponse({ status: 500, description: 'Server Error !!' })
+  @ApiResponse({ status: 404, description: 'Client Error !!' })
 
-  @Post()
-  async create(@Body() dto: CreateUserDto): Promise<void> {
-    const { name, email, password } = dto;
-    await this.usersService.createUser(name, email, password);
+  @Post('/sign-up')
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.createUser(createUserDto);
   }
 
   @Post('/email-verify')
@@ -38,16 +31,21 @@ export class UsersController {
 
   @ApiOperation({ summary: '로그인', description: 'user 로그인 API' })
   @ApiResponse({ status: 201, description: '로그인 성공' })
-  @Post('/login')
-  async login(@Body() dto: UserLoginDto): Promise<string> {
-    const { email, password } = dto;
-    return this.usersService.login(email, password);
+  @Post('/sign-in')
+  async login(@Body() userLoginDto: UserLoginDto) {
+    return await this.usersService.login(userLoginDto);
   }
 
-  @ApiOperation({ summary: '조회', description: 'user 정보조회 API' })
+  @ApiOperation({ summary: '특정 유저 조회', description: 'user 정보조회 API' })
   @Get('/:id')
   async getUserInfo(@Param('id') userId: string): Promise<UserInfo> {
     return await this.usersService.getUserInfo(userId);
+  }
+
+  @ApiOperation({ summary: '모든 유저 조회', description: '모든 user 정보조회 API' })
+  @Get()
+  async getAllUser() {
+    return await this.usersService.findAll();
   }
 }
 

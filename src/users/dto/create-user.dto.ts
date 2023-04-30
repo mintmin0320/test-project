@@ -31,6 +31,6 @@ export class CreateUserDto {
     required: true,
   })
   @IsString()
-  @Matches(/^[A-Za-z\d!@#$%^&*()]{8,30}$/) // 영문 대소문자 특수문자로 이뤄진
+  // @Matches(/^[A-Za-z\d!@#$%^&*()]{8,30}$/) // 영문 대소문자 특수문자로 이뤄진
   readonly password: string;
 }
