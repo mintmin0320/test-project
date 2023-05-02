@@ -32,10 +32,10 @@ export class UsersService {
     return { result: true, message: "회원가입 성공!" };
   }
 
-  async login(userLoginDto: UserLoginDto): Promise<string> {
-    const { email, password } = userLoginDto;
+  async findUser(userId: string): Promise<UserInfo> {
+    const result = await this.usersRepository.userData(userId);
 
-    throw new Error('Method not implemented.');
+    return result;
   }
 
   async findAll() {
@@ -62,10 +62,4 @@ export class UsersService {
 
 
 
-  async getUserInfo(userId: string): Promise<UserInfo> {
-    // 1. userId를 가진 유저가 존재하는지 DB에서 확인하고 없다면 에러 처리
-    // 2. 조회된 데이터를 UserInfo 타입으로 응답
-
-    throw new Error('Method not implemented.');
-  }
 }

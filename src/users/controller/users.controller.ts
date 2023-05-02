@@ -20,7 +20,6 @@ export class UsersController {
   @ApiResponse({ status: 201, description: '회원가입 성공' })
   @ApiResponse({ status: 500, description: 'Server Error !!' })
   @ApiResponse({ status: 404, description: 'Client Error !!' })
-
   @Post('/sign-up')
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.usersService.createUser(createUserDto);
@@ -40,10 +39,11 @@ export class UsersController {
     return await this.authService.jwtSignIn(userLoginDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '특정 유저 조회', description: 'user 정보조회 API' })
   @Get('/:id')
   async getUserInfo(@Param('id') userId: string): Promise<UserInfo> {
-    return await this.usersService.getUserInfo(userId);
+    return await this.usersService.findUser(userId);
   }
 
   @UseGuards(JwtAuthGuard)
