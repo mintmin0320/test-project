@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { UserLoginDto } from 'src/auth/dto/user-login.dto';
@@ -7,6 +7,7 @@ import { UsersService } from '../services/users.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/services/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 @ApiTags('user api')
@@ -49,8 +50,23 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '모든 유저 조회', description: '모든 user 정보조회 API' })
   @Get()
-  async getAllUser() {
+  async getAllUser(): Promise<UserInfo[]> {
     return await this.usersService.findAll();
   }
-}
 
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '회원탈퇴', description: 'user 회원탈퇴 API' })
+  @Delete('/:id')
+  async deleteUser(@Param('id') userId: string): Promise<boolean> {
+    return await this.usersService.deleteUser(userId);
+  }
+
+  @ApiOperation({ summary: '프로필 업로드', description: 'user 프로필 업로드 API' })
+  @Post('upload') //endPoint가 s3upload
+  @UseInterceptors(FileInterceptor('image')) //이미지를 처리하는 방식
+  async uploadMediaFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+
+    return await this.usersService.uploadFileToS3('users', file);
+  }
+}

@@ -41,12 +41,12 @@ export class User extends Document {  // 몽구스 도큐먼트를 상속받고
   @IsNotEmpty()
   password: string;
 
-  // @Prop({//디폴트 이미지 설정하기 회원가입 시 이미지를 업로드 안 하니까
-  //   default:
-  //     'https://raw.githubusercontent.com/amamov/teaching-nestjs-a-to-z/main/images/1.jpeg'
-  // })
-  // @IsString()
-  // imgUrl: string;
+  @Prop({//디폴트 이미지 설정하기 회원가입 시 이미지를 업로드 안 하니까
+    default:
+      'https://raw.githubusercontent.com/amamov/teaching-nestjs-a-to-z/main/images/1.jpeg'
+  })
+  @IsString()
+  imgUrl: string;
 
   readonly readOnlyData: {
     id: string,
