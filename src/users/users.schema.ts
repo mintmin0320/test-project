@@ -5,6 +5,7 @@ import { Document, SchemaOptions } from 'mongoose';
 
 const options: SchemaOptions = { // DB에서 하나가 만들어지면 타임스탬프가 찍힌다.
   timestamps: true,
+  versionKey: false,
 }
 
 @Schema(options) //스키마 정의

@@ -1,16 +1,13 @@
-import { UserLoginDto } from 'src/auth/dto/user-login.dto';
-import { UsersRepository } from './../users.repository';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { EmailService } from 'src/email/email.service';
-import * as uuid from 'uuid';
-import { UserInfo } from '../UserInfo';
-import { CreateUserDto } from '../dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import { User } from '../users.schema';
 import * as path from 'path';
 import * as AWS from 'aws-sdk';
-import { PromiseResult } from 'aws-sdk/lib/request';
 
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UserInfo } from '../UserInfo';
+
+import { EmailService } from 'src/email/email.service';
+import { UsersRepository } from './../users.repository';
 
 @Injectable() // 이 데코 때문에 프로바이더가 되어 다른 컴포넌트에서 주입 가능
 export class UsersService {
@@ -22,11 +19,11 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
   ) {
     this.awsS3 = new AWS.S3({
-      accessKeyId: process.env.AWS_S3_ACCESS_KEY, // process.env.AWS_S3_ACCESS_KEY
+      accessKeyId: process.env.AWS_S3_ACCESS_KEY,
       secretAccessKey: process.env.AWS_S3_SECRET_KEY,
       region: process.env.AWS_S3_REGION,
     });
-    this.S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME; // nest-s3
+    this.S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
   }
 
   async createUser(createUserDto: CreateUserDto) {
@@ -58,18 +55,13 @@ export class UsersService {
     return result;
   }
 
-  async uploadFileToS3(folder: string, file: Express.Multer.File,): Promise<{
-    key: string;
-    s3Object: PromiseResult<AWS.S3.PutObjectOutput, AWS.AWSError>;
-    contentType: string;
-  }> {
-    //함수시작
+  async uploadFileToS3(folder: string, file: Express.Multer.File, userId: string): Promise<UserInfo> {
     try {
       const key = `${folder}/${Date.now()}_${path.basename(
         file.originalname,
       )}`.replace(/ /g, '');
 
-      const s3Object = await this.awsS3
+      await this.awsS3
         .putObject({
           Bucket: this.S3_BUCKET_NAME,
           Key: key,
@@ -78,7 +70,11 @@ export class UsersService {
           ContentType: file.mimetype,
         })
         .promise();
-      return { key, s3Object, contentType: file.mimetype };
+      const imgUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
+
+      const result = await this.usersRepository.findByIdAndUploadImg(userId, imgUrl);
+
+      return result;
     } catch (error) {
       throw new BadRequestException(`File upload failed : ${error}`);
     }

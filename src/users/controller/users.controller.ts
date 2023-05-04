@@ -1,13 +1,15 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+
 import { CreateUserDto } from '../dto/create-user.dto';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { UserLoginDto } from 'src/auth/dto/user-login.dto';
 import { UserInfo } from '../UserInfo';
+
 import { UsersService } from '../services/users.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/services/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 @ApiTags('user api')
@@ -40,33 +42,34 @@ export class UsersController {
     return await this.authService.jwtSignIn(userLoginDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard) 배포 및 테스트 시 주석 해제
+  @ApiOperation({ summary: '모든 유저 조회', description: '모든 user 정보조회 API' })
+  @Get('/')
+  async getAllUser(): Promise<UserInfo[]> {
+    return await this.usersService.findAll();
+  }
+
+  // @UseGuards(JwtAuthGuard) 배포 및 테스트 시 주석 해제
   @ApiOperation({ summary: '특정 유저 조회', description: 'user 정보조회 API' })
   @Get('/:id')
   async getUserInfo(@Param('id') userId: string): Promise<UserInfo> {
     return await this.usersService.findUser(userId);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: '모든 유저 조회', description: '모든 user 정보조회 API' })
-  @Get()
-  async getAllUser(): Promise<UserInfo[]> {
-    return await this.usersService.findAll();
-  }
-
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard) 배포 및 테스트 시 주석 해제
   @ApiOperation({ summary: '회원탈퇴', description: 'user 회원탈퇴 API' })
   @Delete('/:id')
   async deleteUser(@Param('id') userId: string): Promise<boolean> {
     return await this.usersService.deleteUser(userId);
   }
 
+  // @UseGuards(JwtAuthGuard) 배포 및 테스트 시 주석 해제
   @ApiOperation({ summary: '프로필 업로드', description: 'user 프로필 업로드 API' })
-  @Post('upload') //endPoint가 s3upload
-  @UseInterceptors(FileInterceptor('image')) //이미지를 처리하는 방식
-  async uploadMediaFile(@UploadedFile() file: Express.Multer.File) {
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('image')) // @FilesInterceptor 하면 여러개
+  async uploadMediaFile(@UploadedFile() file: Express.Multer.File, @Body('id') userId: string): Promise<UserInfo> {
     console.log(file);
 
-    return await this.usersService.uploadFileToS3('users', file);
+    return await this.usersService.uploadFileToS3('users', file, userId);
   }
 }
