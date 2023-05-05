@@ -32,6 +32,11 @@ async function bootstrap() {
   // .setup('swagger ui endpoint', app, swagger_document)
   SwaggerModule.setup('api', app, document);
 
+  app.enableCors({
+    origin: process.env.ORIGIN,
+    credentials: true,
+  }
+  );
   await app.listen(process.env.PORT, () => console.log(`Application listening on port ${process.env.PORT}`));
 }
 bootstrap();
