@@ -1,15 +1,15 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { Document, SchemaOptions } from 'mongoose';
 
-const options: SchemaOptions = { // DB에서 하나가 만들어지면 타임스탬프가 찍힌다.
-  timestamps: true,
+const options: SchemaOptions = {
+  timestamps: true, // DB에서 하나가 만들어지면 타임스탬프가 찍힌다.
   versionKey: false,
 }
 
 @Schema(options) //스키마 정의
-export class User extends Document {  // 몽구스 도큐먼트를 상속받고
+export class User extends Document {  // 몽구스 도큐먼트를 상속받음
   @ApiProperty({
     example: 'mintmin0320@gmail.com',
     description: 'email',
@@ -42,7 +42,7 @@ export class User extends Document {  // 몽구스 도큐먼트를 상속받고
   @IsNotEmpty()
   password: string;
 
-  @Prop({//디폴트 이미지 설정하기 회원가입 시 이미지를 업로드 안 하니까
+  @Prop({ //디폴트 이미지 설정하기 회원가입 시 이미지를 업로드 안 하니까
     default:
       'https://raw.githubusercontent.com/amamov/teaching-nestjs-a-to-z/main/images/1.jpeg'
   })
